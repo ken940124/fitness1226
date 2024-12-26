@@ -1,0 +1,343 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import random
+from PIL import Image, ImageTk
+
+motivational_quotes = [
+    "每一次的努力，都是為了更好的自己！",
+    "相信自己，你比想像中更強大！",
+    "沒有不可能，只有不敢嘗試！",
+    "每一天都是新的機會，勇敢踏出第一步！",
+    "流的汗水，會成為你的榮耀！",
+]
+
+# 定義健身計畫
+gym_plans = { 
+    ("過輕", "增肌", "居家"): (r"1.png","伏地挺身 (Push-ups)：4 組 × 12 次\n深蹲 (Bodyweight Squats)：4 組 × 15 次\n仰臥抬腿 (Leg Raises)：4 組 × 12 次\n超人式 (Superman Hold)：4 組 × 30 秒"), 
+    ("過輕", "增肌", "健身房"): (r"2.png","槓鈴肩推 (Overhead Barbell Press)：4 組 × 10 次\n啞鈴側平舉 (Dumbbell Lateral Raises)：3 組 × 15 次\n槓鈴硬舉 (Barbell Deadlifts)：4 組 × 10 次\n二頭彎舉 (Biceps Curls)：4 組 × 12 次\n仰臥腿舉 (Leg Press)：4 組 × 12 次"),    
+    ("過重", "增肌", "健身房"): (r"3.png","槓鈴深蹲 (Barbell Squats)：4 組 × 10 次\n槓鈴臥推 (Barbell Bench Press)：4 組 × 10 次\n槓鈴肩推 (Overhead Barbell Press)：4 組 × 10 次\n坐姿划船機 (Seated Row Machine)：4 組 × 12 次"),    ("過重", "增肌", "居家"):(r"4.png","伏地挺身 (Push-ups)：4 組 × 8 次\n深蹲 (Bodyweight Squats)：4 組 × 10 次\n站姿抬腿 (Standing Leg Raises)：3 組 × 12 次\n側平板支撐 (Side Plank)：4 組 × 30 秒"),
+    ("過輕", "減脂", "居家"): (r"3.png","您的 BMI 顯示體重過輕，不建議進行減脂運動，請選擇增肌。"),
+    ("過輕", "減脂", "健身房"): (r"5.png","您的 BMI 顯示體重過輕，不建議進行減脂運動，請選擇增肌。"),
+    ("適中", "增肌", "居家"): (r"6.png","伏地挺身 (Push-ups)：4 組 × 12 次\n深蹲 (Bodyweight Squats)：4 組 × 15 次\n仰臥抬腿 (Leg Raises)：4 組 × 12 次\n超人式 (Superman Hold)：4 組 × 30 秒"),
+    ("適中", "增肌", "健身房"):(r"6.png", "槓鈴肩推 (Overhead Barbell Press)：4 組 × 10 次\n啞鈴側平舉 (Dumbbell Lateral Raises)：3 組 × 15 次\n槓鈴硬舉 (Barbell Deadlifts)：4 組 × 10 次\n二頭彎舉 (Biceps Curls)：4 組 × 12 次\n仰臥腿舉 (Leg Press)：4 組 × 12 次"),
+    ("過重", "減脂", "健身房"): (r"5.png","跑步機間歇跑 (Treadmill Interval Running)：20 分鐘（快跑 1 分鐘，慢走 2 分鐘，重複 6 次）\n划船機 (Rowing Machine)：15 分鐘\n站姿提膝 (Standing Knee Raises)：3 組 × 12 次\n仰臥捲腹 (Crunches)：4 組 × 15 次"),
+    ("過重", "減脂", "居家"): (r"10.png","波比跳 (Burpees)：4 組 × 10 次\n登山跑 (Mountain Climbers)：4 組 × 30 秒\n高抬腿跑 (High Knees)：4 組 × 1 分鐘\n平板撐側轉 (Side Plank Twists)：3 組 × 15 次"),
+    ("適中", "減脂", "居家"):(r"10.png", "波比跳 (Burpees)：4 組 × 10 次\n開合跳 (Jumping Jacks)：5 組 × 1 分鐘\n平板撐開腳 (Plank Jacks)：4 組 × 30 秒\n高抬腿跑 (High Knees)：5 組 × 45 秒"),
+    ("適中", "減脂", "健身房"): (r"8.png","橢圓機 (Elliptical)：20 分鐘（穩定心率運動）\n跑步機 (Treadmill)：20 分鐘（間歇跑）\n跳繩 (Jump Rope)：4 組 × 2 分鐘\n自行車機 (Stationary Bike)：20 分鐘"),
+    ("適中", "維持運動習慣", "居家"): (r"4.png","開合跳 (Jumping Jacks)：3 組 × 1 分鐘\n伏地挺身 (Push-ups)：3 組 × 10 次\n深蹲 (Bodyweight Squats)：3 組 × 12 次\n仰臥抬腿 (Leg Raises)：3 組 × 12 次"),
+    ("適中", "維持運動習慣", "健身房"):(r"11.png", "跑步機慢跑 (Treadmill Jogging)：15 分鐘（速度 6-8 km/h）\n啞鈴側平舉 (Dumbbell Lateral Raises)：3 組 × 12 次\n槓鈴硬舉 (Barbell Deadlifts)：3 組 × 8 次\n仰臥捲腹 (Crunches)：3 組 × 15 次"),
+    ("過重", "維持運動習慣", "居家"):(r"12.png", "開合跳 (Jumping Jacks)：3 組 × 1 分鐘\n伏地挺身 (Push-ups)：3 組 × 8 次\n深蹲 (Bodyweight Squats)：3 組 × 10 次\n平板支撐 (Plank)：3 組 × 20 秒"),
+    ("過重", "維持運動習慣", "健身房"):(r"13.png", "跑步機快走 (Treadmill Walking)：15 分鐘（坡度 5%）\n腿舉機 (Leg Press Machine)：3 組 × 10 次\n槓鈴臥推 (Barbell Bench Press)：3 組 × 10 次\n側平舉 (Lateral Raises)：3 組 × 12 次")
+}
+
+root = tk.Tk()
+root.title("健身菜單私人訂製系統")
+root.geometry("650x750")
+# background_image = tk.PhotoImage(
+#     file="1567475606-50eace77e48bb3363f8c1e1a9fae3424-1000x669.png"
+# )
+
+img1 = Image.open("background.png")
+img1 = img1.resize((1050, 950))  # 原图片3840x2160
+background_image = ImageTk.PhotoImage(image=img1, size=50)  # PIL的
+
+
+# canvas = tk.Canvas(root, width=200, height=200)
+# canvas.create_image(0, 0, anchor="nw", image=background_image)  # 在 Canvas 中放入圖片
+# canvas.pack()
+
+
+def set_background():
+    """設置背景圖片"""
+    bg_label = tk.Label(root, image=background_image)
+    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+
+# 記錄使用者姓名
+global user_name
+user_name = ""
+
+
+# 主頁面功能
+def show_main_page():
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    set_background()  # 設置背景
+    quote = random.choice(motivational_quotes)
+    tk.Label(
+        root,
+        text="歡迎使用健身菜單私人訂製系統",
+        font=("微軟正黑體", 36, "bold"),
+        fg="white",
+        bg="#000000",
+        anchor="s",
+    ).pack(pady=200)
+    tk.Label(
+        root,
+        text=quote,
+        font=("微軟正黑體", 18, "bold"),
+        fg="white",
+        wraplength=500,
+        justify="center",
+        bg="#000000",
+        anchor="center",
+    ).pack(pady=0)
+    tk.Button(
+        root, text="開始測試", font=("微軟正黑體", 20, "bold"), command=ask_name_page
+    ).pack(pady=30)
+
+
+# 新增詢問姓名頁面
+def ask_name_page():
+    for widget in root.winfo_children():
+        widget.destroy()
+    set_background()
+    tk.Label(
+        root,
+        text="請輸入您的姓名: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=160)
+    name_entry = tk.Entry(root, font=("微軟正黑體", 14))
+    name_entry.pack()
+
+    tk.Button(
+        root,
+        text="提交",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+        command=lambda: save_name_and_next(name_entry),
+    ).pack(pady=20)
+    tk.Button(
+        root,
+        text="返回主頁",
+        font=("微軟正黑體", 16),
+        fg="white",
+        bg="#000000",
+        command=show_main_page,
+    ).pack(pady=10)
+
+
+def save_name_and_next(name_entry):
+    global user_name
+    user_name = name_entry.get()
+    if not user_name.strip():
+        messagebox.showerror("錯誤", "姓名不能為空！")
+    else:
+        show_input_page()
+
+
+# 輸入頁面功能
+def show_input_page():
+    for widget in root.winfo_children():
+        widget.destroy()
+    set_background()
+    tk.Label(
+        root,
+        text="請輸入您的身高（cm）: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=5)
+    height_entry = tk.Entry(root, font=("微軟正黑體", 14))
+    height_entry.pack()
+
+    tk.Label(
+        root,
+        text="請輸入您的體重（kg）: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=5)
+    weight_entry = tk.Entry(root, font=("微軟正黑體", 14))
+    weight_entry.pack()
+
+    tk.Label(
+        root,
+        text="請選擇運動場所: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=5)
+    location_combobox = ttk.Combobox(
+        root, values=["居家", "健身房"], font=("微軟正黑體", 14)
+    )
+    location_combobox.pack()
+
+    tk.Label(
+        root,
+        text="請選擇運動目標: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=5)
+    goal_combobox = ttk.Combobox(
+        root, values=["增肌", "減脂", "維持運動習慣"], font=("微軟正黑體", 14)
+    )
+    goal_combobox.pack()
+
+    tk.Label(
+        root,
+        text="請輸入您的年齡: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=5)
+    age_entry = tk.Entry(root, font=("微軟正黑體", 14))
+    age_entry.pack()
+
+    tk.Label(
+        root,
+        text="請選擇您的性別: ",
+        font=("微軟正黑體", 16, "bold"),
+        fg="white",
+        bg="#000000",
+    ).pack(pady=5)
+    gender_combobox = ttk.Combobox(root, values=["男", "女"], font=("微軟正黑體", 14))
+    gender_combobox.pack()
+
+    tk.Button(
+        root,
+        text="提交",
+        font=("微軟正黑體", 16),
+        command=lambda: calculate_tdee_and_show_plan(
+            height_entry,
+            weight_entry,
+            age_entry,
+            gender_combobox,
+            location_combobox,
+            goal_combobox,
+        ),
+    ).pack(pady=20)
+
+    tk.Button(
+        root, text="返回主頁", font=("微軟正黑體", 16), command=show_main_page
+    ).pack(pady=10)
+
+
+# TDEE 計算與顯示計畫
+def calculate_tdee_and_show_plan(
+    height_entry,
+    weight_entry,
+    age_entry,
+    gender_combobox,
+    location_combobox,
+    goal_combobox,
+):
+    set_background()
+    try:
+        height = float(height_entry.get())
+        weight = float(weight_entry.get())
+        age = int(age_entry.get())
+        gender = gender_combobox.get()
+        location = location_combobox.get()
+        goal = goal_combobox.get()
+
+        if gender == "男":
+            bmr = 10 * weight + 6.25 * height - 5 * age + 5
+        elif gender == "女":
+            bmr = 10 * weight + 6.25 * height - 5 * age - 161
+        else:
+            messagebox.showerror("錯誤", "請選擇性別！")
+            return
+
+        tdee = bmr * 1.55  # 假設中等運動量
+
+        # 計算 BMI
+        height_m = height / 100
+        bmi = weight / (height_m**2)
+
+        if bmi < 18.5:
+            bmi_category = "過輕"
+        elif bmi < 24.9:
+            bmi_category = "適中"
+        else:
+            bmi_category = "過重"
+
+        if not location or not goal:
+            messagebox.showerror("錯誤", "請選擇運動場所和運動目標！")
+            return
+
+        key = (bmi_category, goal, location)
+        plan = gym_plans.get(key, "未找到適合您的健身計畫，請確認您的選擇！")
+
+        # 計算建議的熱量攝取
+        if goal == "增肌":
+            calorie_suggestion = f"建議每日攝取約 {tdee + 500:.2f} 大卡來增肌。"
+        elif goal == "減脂":
+            calorie_suggestion = f"建議每日攝取約 {tdee - 500:.2f} 大卡來減脂。"
+        else:
+            calorie_suggestion = "建議維持現有的熱量攝取。"
+
+        show_plan_page(plan, tdee, calorie_suggestion)
+    except ValueError:
+        messagebox.showerror("錯誤", "請輸入正確的資料！")
+
+
+# 顯示計畫頁面
+image_references = []
+
+def show_plan_page(plan, tdee, calorie_suggestion):
+    set_background()
+    for widget in root.winfo_children():
+        widget.destroy()
+
+    # 設置背景
+    set_background()
+
+    # 顯示標題
+    tk.Label(root, text="您的健身計畫", font=("微軟正黑體", 20, "bold"), fg="white", bg="#000000").pack(pady=20)
+    greeting = f"你好，{user_name}，歡迎使用健身菜單私人訂製系統！"
+    tk.Label(root, text=greeting, font=("微軟正黑體", 16, "bold"), fg="white", bg="#000000").pack(pady=10)
+
+    # 顯示 TDEE
+    tk.Label(root, text=f"您的 TDEE 為: {tdee:.2f} 大卡", font=("微軟正黑體", 16), fg="#a3e2f0", bg="#000000").pack(pady=10)
+    tk.Label(root, text=calorie_suggestion, font=("微軟正黑體", 16), fg="#f75757", bg="#000000").pack(pady=10)
+
+    # 顯示對應的圖片
+    try:
+        # 讀取圖片並進行縮放
+        img = Image.open(plan[0])  # 這裡 plan[0] 是圖片的路徑
+        img = img.resize((550, 350))  # 調整圖片大小
+        img_tk = ImageTk.PhotoImage(img)
+
+        img_label = tk.Label(root, image=img_tk)
+        img_label.image = img_tk  # 保存圖片引用，避免被垃圾回收
+        img_label.pack(pady=10)
+    except Exception as e:
+        print(f"無法載入圖片: {e}")
+
+    tk.Label(root, text=plan[1], wraplength=400, justify="left", font=("微軟正黑體", 16), fg="white", bg="#000000").pack(pady=15)
+
+
+    # 顯示操作按鈕
+    button_frame = tk.Frame(root, bg="#000000")
+    button_frame.pack(pady=20)
+    
+    tk.Button(button_frame, text="返回主頁", font=("微軟正黑體", 16, "bold"), command=show_main_page).pack(side="left", padx=10)
+    tk.Button(button_frame, text="健身小知識", font=("微軟正黑體", 16, "bold"), command=show_fitness_tip).pack(side="left", padx=10)
+    tk.Button(button_frame, text="更改健身目標", font=("微軟正黑體", 16, "bold"), command=show_input_page).pack(side="left", padx=10)
+
+
+
+
+fitness_tips = [
+    "運動後補充蛋白質有助於增肌恢復。",
+    "避免長時間空腹後運動，可能導致低血糖。",
+    "深蹲時保持膝蓋與腳尖同向，避免膝蓋受傷。",
+    "充足的睡眠有助於肌肉生長和脂肪燃燒。",
+    "喝足夠的水以保持運動表現。",
+]
+
+
+def show_fitness_tip():
+    tip = random.choice(fitness_tips)
+    messagebox.showinfo("健身小知識", tip)
+
+
+show_main_page()
+
+root.mainloop()
